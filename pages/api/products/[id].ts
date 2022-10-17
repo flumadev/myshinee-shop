@@ -1,4 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import axios, { AxiosResponse } from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(
@@ -12,15 +13,26 @@ export default async function handler(
 
     const { id } = req.query
 
-    const data = await fetch(`${process.env.BASE_URL}/products`)
+    const response = await axios.get(`${process.env.BASE_URL}/products`)
 
-    if (data.status === 200) {
-        let response: Array<any> = await data.json();
-        const product = response.filter(item => item.product_id == id)
-        res.status(200).json(product)
+
+    if (response.status !== 200) {
+        return res.status(422)
     }
 
-    res.status(500)
+    if (id === undefined) {
+        return res.status(422).json({ message: 'You must provide the product ID' })
+    }
+
+    if (typeof id !== "string") {
+        return res.status(422).json({ message: 'You must provide only one product ID' })
+
+    }
+
+
+    const product = response.data.filter((item: IProduct) => item.product_id == parseInt(id))
+    return res.status(200).json(product)
+
 
 
 }
