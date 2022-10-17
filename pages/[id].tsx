@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { celularMask, cpfMask } from '../helpers/masks';
 import { useRouter } from 'next/router';
 import axios from 'axios'
-import { Button, Container, Divider, Flex, FormControl, FormLabel, HStack, Input, Select, Skeleton, Text, VStack, } from '@chakra-ui/react'
+import { Button, Container, Divider, Flex, FormControl, FormLabel, HStack, Input, Select, Skeleton, Text, useToast, VStack, } from '@chakra-ui/react'
 import pix from '../assets/pix.svg';
 import invoice from '../assets/invoice.svg';
 import credit from '../assets/credit.svg';
@@ -26,7 +26,7 @@ const Home: NextPage = () => {
   const [cpf, setCpf] = useState("")
   const [phone, setPhone] = useState("")
   const route = useRouter()
-
+  const toast = useToast()
   const { id } = route.query
   const form = useRef()
 
@@ -79,6 +79,20 @@ const Home: NextPage = () => {
     setLoadingPayment(true)
     if (paymentMethod === 'pix') {
       const response = await axios.post(`${process.env.BASE_URL}/products/pay/pix/${id}`, clientData)
+
+      if (response.data.status === "failed") {
+        setLoadingPayment(false)
+        toast({
+          title: 'Erro ao gerar QRcode',
+          description: "Entre em contato conosco",
+          status: 'error',
+          duration: 9000,
+          isClosable: true,
+        })
+        return
+      }
+
+
       localStorage.setItem("@ms-pix", JSON.stringify(response.data))
     }
 
