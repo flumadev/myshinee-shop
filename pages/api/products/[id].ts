@@ -12,8 +12,6 @@ export default async function handler(
 
     const { id } = req.query
 
-    console.log(id);
-
     const data = await fetch(`${process.env.BASE_URL}/products`)
 
     if (data.status === 200) {
@@ -21,6 +19,9 @@ export default async function handler(
         const product = response.filter(item => item.product_id == id)
         res.status(200).json(product)
     }
+
+    res.status(500)
+
 
 }
 

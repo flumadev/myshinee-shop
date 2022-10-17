@@ -4,7 +4,10 @@ const nextConfig = {
   swcMinify: true,
   env: {
     BASE_URL: process.env.BASE_URL
-  }
+  },
+  images: {
+    domains: ['api.pagar.me'],
+  },
 }
 
 module.exports = nextConfig

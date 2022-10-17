@@ -26,10 +26,14 @@ export default function handler(
         con.query(`SELECT wp_wc_product_meta_lookup.product_id,wp_wc_product_meta_lookup.max_price , wp_posts.post_title FROM wp_wc_product_meta_lookup INNER JOIN  wp_posts ON ( wp_posts.ID = wp_wc_product_meta_lookup.product_id)`, function (err, result) {
             if (err) return res.status(500).json(err);
 
+            con.end()
             return res.status(200).json(result)
         });
 
     });
+
+    return res.status(500)
+
 }
 
 
