@@ -37,7 +37,7 @@ const Home: NextPage = () => {
   const getProduct = async (productId: number | string | string[]) => {
     setLoading(true)
 
-    const response = await axios.get(`/api/products/${productId}`)
+    const response = await axios.get(`${process.env.BASE_URL}/products/${productId}`)
 
     if (response.data[0]) {
       setProduct({
@@ -78,7 +78,7 @@ const Home: NextPage = () => {
   const pay = async () => {
     setLoadingPayment(true)
     if (paymentMethod === 'pix') {
-      const response = await axios.post(`/api/products/pay/pix/${id}`, clientData)
+      const response = await axios.post(`${process.env.BASE_URL}/products/pay/pix/${id}`, clientData)
       localStorage.setItem("@ms-pix", JSON.stringify(response.data))
     }
 
