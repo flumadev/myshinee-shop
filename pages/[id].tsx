@@ -109,9 +109,9 @@ const Home: NextPage = () => {
   }, [id])
 
   return (
-    <Container maxW={'6xl'} margin="auto" padding={"24"}>
+    <Container maxW={'6xl'} margin="24px auto" padding={{ sm: "12", lg: "24" }}>
       <Text fontSize={'2xl'} fontWeight={"bold"}>Detalhes de Pagamento</Text>
-      <Flex justifyContent={'space-between'} mt="12" >
+      <Flex justifyContent={'space-between'} mt="12" gap={"20px"} flexDir={{ base: "column", lg: "row" }}>
 
         {/* @ts-ignore */}
         <Flex as={"form"} ref={form} id="clientForm" flexDirection={"column"} gap="6" onSubmit={handleSubmit}>
@@ -178,18 +178,22 @@ const Home: NextPage = () => {
           </Container>
           <Container border={"1px solid"} borderColor="gray.200" padding="6" borderRadius={"md"} >
             <Text fontSize={'xl'} mb="6">Método de pagamento</Text>
-            <HStack>
-              <PaymentCard clicked={paymentMethod === "debit" && canPay} icon={debit} text="Débito" onClick={() => { setPaymentMethod("debit") }} />
-              <PaymentCard clicked={paymentMethod === "credit" && canPay} icon={credit} text="Crédito" onClick={() => { setPaymentMethod("credit") }} />
-              <PaymentCard clicked={paymentMethod === "bankslip" && canPay} icon={invoice} text="Boleto" onClick={() => { setPaymentMethod("bankslip") }} />
-              <PaymentCard clicked={paymentMethod === "pix" && canPay} icon={pix} text="Pix" onClick={() => { setPaymentMethod("pix") }} />
-            </HStack>
+            <Flex gap={"12px"} alignItems="center" justifyContent={"center"} direction={{ base: "column", sm: "row" }}>
+              <HStack gap={"6px"}>
+                <PaymentCard clicked={paymentMethod === "debit" && canPay} icon={debit} text="Débito" onClick={() => { setPaymentMethod("debit") }} />
+                <PaymentCard clicked={paymentMethod === "credit" && canPay} icon={credit} text="Crédito" onClick={() => { setPaymentMethod("credit") }} />
+              </HStack>
+              <HStack gap={"6px"}>
+                <PaymentCard clicked={paymentMethod === "bankslip" && canPay} icon={invoice} text="Boleto" onClick={() => { setPaymentMethod("bankslip") }} />
+                <PaymentCard clicked={paymentMethod === "pix" && canPay} icon={pix} text="Pix" onClick={() => { setPaymentMethod("pix") }} />
+              </HStack>
+            </Flex>
           </Container>
 
         </Flex>
 
 
-        <Container >
+        <Container padding={"0"} >
           <Container borderRadius={'md'} bgColor="gray.100" padding={'6'} >
             <HStack mb={"3"} justifyContent={"space-between"}>
               <Text fontWeight={"bold"} fontSize="xl">Total</Text>
@@ -205,7 +209,7 @@ const Home: NextPage = () => {
               </HStack>
             </Skeleton>
             {(canPay && paymentMethod === "pix") && (
-              <>
+              <Container padding={0} fontSize={{ base: "14px", sm: "16px" }}>
                 <Divider my={"3"} borderColor={"grey.500"} />
                 <Text fontWeight={"bold"}>Cliente</Text>
                 <HStack justifyContent={"space-between"}>
@@ -227,7 +231,8 @@ const Home: NextPage = () => {
                 <Text mt={"3"} fontWeight={"bold"}>Endereço de entrega</Text>
                 <HStack my={"3"} justifyContent={"space-between"}>
                   <Text >{`${clientData.street}, N°${clientData.number} ${clientData.complement ? ", " + clientData.complement : ""}, ${clientData.district} - ${clientData.city}, ${clientData.state}`}</Text>
-                </HStack></>
+                </HStack>
+              </Container>
             )}
             {/* <HStack mt={"3"} justifyContent={"space-between"}>
               <Text fontWeight={"bold"}>Desconto</Text>

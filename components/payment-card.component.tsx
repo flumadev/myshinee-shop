@@ -6,7 +6,7 @@ interface IPaymentProps extends HTMLChakraProps<"div"> { icon: any, text: string
 
 function PaymentCard(props: IPaymentProps) {
     return (
-        <Container {...props} width={"200px"} as={"button"} type="submit" height="80px" borderRadius={"md"} border={"1px solid"} borderColor={props.clicked ? "#058789" : "gray.200"} display={"flex"} justifyContent="center" alignItems={"center"}>
+        <Container {...props} as={"button"} margin="0" type="submit" height="80px" w="80px" borderRadius={"md"} border={"1px solid"} borderColor={props.clicked ? "#058789" : "gray.200"} display={"flex"} justifyContent="center" alignItems={"center"}>
             <VStack justifyContent={"center"} alignItems="center">
                 <Image src={props.icon} width="25" height={"25"} />
                 <Text>{props.text}</Text>
