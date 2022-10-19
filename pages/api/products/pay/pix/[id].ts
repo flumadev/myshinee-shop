@@ -1,5 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
+import axios from 'axios'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import api from '../../../../../services/api.service'
 
@@ -29,13 +30,30 @@ export default async function handler(
     const product: IProduct = response.filter(item => item.product_id == id)[0]
 
     const formData: IFormValues = req.body
-    console.log(product.max_price * 100);
+    let itemValueToPay = product.max_price * 100
+
+    if (formData.cupomCode !== "") {
+        const cupomResponseData = await axios.get(`${process.env.BASE_URL}/cupons/${formData.cupomCode}`)
+        const cupomData: ICupom = cupomResponseData.data[0]
+        console.log(formData);
+
+        if (cupomData === undefined) {
+            return res.status(422).json({ message: "cupom invalido" })
+        }
+
+        if (cupomData.discount_type === "percent") {
+            const value = product.max_price * 100
+            const discount = ((parseFloat(cupomData.coupon_amount) / 100) * value)
+            itemValueToPay = value - discount;
+        }
+    }
+
 
 
     const customerObject = {
         "items": [
             {
-                "amount": product.max_price * 100,
+                "amount": itemValueToPay,
                 "description": product.post_title,
                 "quantity": 1
             }
@@ -65,7 +83,7 @@ export default async function handler(
             {
                 "payment_method": "pix",
                 "pix": {
-                    "expires_in": "600",
+                    "expires_in": "1800",
                     "additional_information": [
                         {
                             "name": "MyShinee",

@@ -29,6 +29,15 @@ function Index() {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
     }
 
+    const treatExpireTime = () => {
+        const hour = new Date(paymentData.charges[0].last_transaction.expires_at).getHours()
+        let minutes = (new Date(paymentData.charges[0].last_transaction.expires_at).getMinutes()).toString()
+        if (parseInt(minutes) < 10) {
+            minutes = "0" + minutes
+        }
+        return `${hour}:${minutes}`
+    }
+
     useEffect(() => {
         const localData = localStorage.getItem("@ms-pix")
 
@@ -60,7 +69,7 @@ function Index() {
                             <Text fontWeight={"bold"} fontSize={"xl"}>Vencimento</Text>
                         </VStack>
                         <VStack>
-                            <Text>{paymentData.charges && `${new Date(paymentData.charges[0].last_transaction.expires_at).getHours()}:${new Date(paymentData.charges[0].last_transaction.expires_at).getMinutes()}`}</Text>
+                            <Text>{paymentData.charges && treatExpireTime()}</Text>
                         </VStack>
                     </Container>
                 </HStack>

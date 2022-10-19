@@ -13,26 +13,29 @@ import PaymentCard from '../components/payment-card.component';
 import { states } from '../helpers/objects';
 import { stringify } from 'querystring';
 
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+}
 
 
 const Home: NextPage = () => {
   const [loading, setLoading] = useState(true)
   const [loadingPayment, setLoadingPayment] = useState(false)
-  const [total, setTotal] = useState(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(0))
+  const [productPrice, setProductPrice] = useState(formatCurrency(0))
+  const [total, setTotal] = useState(formatCurrency(0))
   const [product, setProduct] = useState({} as IProduct)
   const [paymentMethod, setPaymentMethod] = useState("")
   const [canPay, setCanPay] = useState(false)
   const [clientData, setClientData] = useState({} as IFormValues)
   const [cpf, setCpf] = useState("")
   const [phone, setPhone] = useState("")
+  const [cupomCode, setCupomCode] = useState("")
+  const [discountValue, setDiscountValue] = useState("")
   const route = useRouter()
   const toast = useToast()
   const { id } = route.query
   const form = useRef()
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
-  }
 
   const getProduct = async (productId: number | string | string[]) => {
     setLoading(true)
@@ -45,6 +48,7 @@ const Home: NextPage = () => {
         max_price: formatCurrency(response.data[0].max_price)
 
       })
+      setProductPrice(formatCurrency(response.data[0].max_price))
       setTotal(formatCurrency(response.data[0].max_price))
       setLoading(false)
     }
@@ -78,7 +82,7 @@ const Home: NextPage = () => {
   const pay = async () => {
     setLoadingPayment(true)
     if (paymentMethod === 'pix') {
-      const response = await axios.post(`${process.env.BASE_URL}/products/pay/pix/${id}`, clientData)
+      const response = await axios.post(`${process.env.BASE_URL}/products/pay/pix/${id}`, { ...clientData, cupomCode })
 
       if (response.data.status === "failed") {
         setLoadingPayment(false)
@@ -102,6 +106,36 @@ const Home: NextPage = () => {
 
   }
 
+  const applyCupom = async () => {
+    if (cupomCode === "") {
+      return
+    }
+    setLoading(true)
+    const cupomResponseData = await axios.get(`${process.env.BASE_URL}/cupons/${cupomCode}`)
+    const cupomData: ICupom = cupomResponseData.data[0]
+    if (cupomData === undefined) {
+      toast({
+        title: 'Cupom inválido',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      })
+      setLoading(false)
+
+      return
+    }
+
+    if (cupomData.discount_type === "percent") {
+      const value = parseFloat(productPrice.replaceAll("R$", ""))
+      const discount = ((parseFloat(cupomData.coupon_amount) / 100) * value)
+      const valueWithDiscount = value - discount;
+      setTotal(formatCurrency(valueWithDiscount))
+      setDiscountValue(formatCurrency(discount))
+      setLoading(false)
+    }
+
+  }
+
   useEffect(() => {
     if (id !== undefined) {
       getProduct(id)
@@ -109,7 +143,7 @@ const Home: NextPage = () => {
   }, [id])
 
   return (
-    <Container maxW={'6xl'} margin="24px auto" padding={{ sm: "12", lg: "24" }}>
+    <Container maxW={'7xl'} margin="24px auto" padding={{ sm: "12", lg: "24" }}>
       <Text fontSize={'2xl'} fontWeight={"bold"}>Detalhes de Pagamento</Text>
       <Flex justifyContent={'space-between'} mt="12" gap={"20px"} flexDir={{ base: "column", lg: "row" }}>
 
@@ -207,6 +241,12 @@ const Home: NextPage = () => {
                 <Text fontWeight={"bold"}>{product.post_title}</Text>
                 <Text >{product.max_price}</Text>
               </HStack>
+              {discountValue && (
+                <HStack mt={"3"} justifyContent={"space-between"}>
+                  <Text fontWeight={"bold"}>Desconto</Text>
+                  <Text color={"red.400"}>- {discountValue}</Text>
+                </HStack>
+              )}
             </Skeleton>
             {(canPay && paymentMethod === "pix") && (
               <Container padding={0} fontSize={{ base: "14px", sm: "16px" }}>
@@ -234,20 +274,31 @@ const Home: NextPage = () => {
                 </HStack>
               </Container>
             )}
-            {/* <HStack mt={"3"} justifyContent={"space-between"}>
-              <Text fontWeight={"bold"}>Desconto</Text>
-              <Text color={"red.400"}>- R$ 20,00</Text>
-            </HStack> */}
+
 
           </Container>
           <HStack mt={"3"} justifyContent={"space-between"}>
-            {/* <FormControl>
+            <FormControl>
               <FormLabel>Cupom</FormLabel>
               <HStack>
-                <Input bgColor={"white"} />
-                <Button border={"1px solid #058789"} color={"#058789"}>Aplicar</Button>
+                <Input bgColor={"white"} value={cupomCode} disabled={discountValue !== ""} onChange={(e) => {
+                  setCupomCode(e.target.value)
+                }} />
+                {discountValue !== "" ? (
+                  <Button colorScheme={"red"} onClick={() => {
+                    setCupomCode("")
+                    setDiscountValue("")
+                    setTotal(productPrice)
+                  }}>Remover</Button>
+
+                ) :
+                  <Button isLoading={loading} border={"1px solid #058789"} color={"#058789"} onClick={() => {
+                    applyCupom()
+                  }}>Aplicar</Button>
+                }
+
               </HStack>
-            </FormControl> */}
+            </FormControl>
           </HStack>
           <Button w={"100%"} mt="2" bgColor={"#058789"} color="white" disabled={canPay ? false : true} onClick={() => pay()} isLoading={loadingPayment}>Pagar</Button>
         </Container>

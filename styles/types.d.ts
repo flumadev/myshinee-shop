@@ -4,6 +4,14 @@ interface IProduct {
     product_id: number
 }
 
+interface ICupom {
+    ID: number,
+    coupon_code: string,
+    coupon_description: string,
+    discount_type: "percent" | "fixed_cart" | "fixed_product",
+    coupon_amount: string,
+    date_expires: string
+}
 
 interface IFormValues {
     cpf: string
@@ -17,6 +25,7 @@ interface IFormValues {
     complement?: string
     city: string
     state: string
+    cupomCode?: string
 }
 
 interface IPix {
