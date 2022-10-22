@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import type { NextPage } from 'next'
 import Image from 'next/image'
-import { celularMask, cpfMask } from '../helpers/masks';
+import { cardExpireMask, cardNumberMask, celularMask, cpfMask } from '../helpers/masks';
 import { useRouter } from 'next/router';
 import axios from 'axios'
 import { Button, Container, Divider, Flex, FormControl, FormLabel, HStack, Input, Select, Skeleton, Text, useToast, VStack, } from '@chakra-ui/react'
@@ -11,7 +11,6 @@ import credit from '../assets/credit.svg';
 import debit from '../assets/debit.svg';
 import PaymentCard from '../components/payment-card.component';
 import { states } from '../helpers/objects';
-import { stringify } from 'querystring';
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
@@ -24,10 +23,17 @@ const Home: NextPage = () => {
   const [productPrice, setProductPrice] = useState(formatCurrency(0))
   const [total, setTotal] = useState(formatCurrency(0))
   const [product, setProduct] = useState({} as IProduct)
-  const [paymentMethod, setPaymentMethod] = useState("")
+  const [paymentMethod, setPaymentMethod] = useState("" as "credit" | "debit" | "pix")
   const [canPay, setCanPay] = useState(false)
   const [clientData, setClientData] = useState({} as IFormValues)
   const [cpf, setCpf] = useState("")
+  const [cardData, setCardData] = useState({
+    cardNumber: "",
+    cardExpire: "",
+    cardCVV: "",
+    cardHolder: "",
+    installments: 1
+  })
   const [phone, setPhone] = useState("")
   const [cupomCode, setCupomCode] = useState("")
   const [discountValue, setDiscountValue] = useState("")
@@ -95,13 +101,64 @@ const Home: NextPage = () => {
         })
         return
       }
-
-
       localStorage.setItem("@ms-pix", JSON.stringify(response.data))
+      setLoadingPayment(false)
+      route.push('/pix')
     }
 
-    setLoadingPayment(false)
-    route.push('/pix')
+    if (paymentMethod === 'debit') {
+      try {
+        const response = await axios.post(`${process.env.BASE_URL}/products/pay/card/debit/${id}`, { ...clientData, cardData, cupomCode })
+        if (response.data.status === "failed") {
+          toast({
+            title: 'Pagamento não autorizado',
+            description: "Verifique os dados e tente novamente ou entre em contato com seu banco.",
+            status: 'error',
+            duration: 9000,
+            isClosable: true,
+          })
+        }
+        setLoadingPayment(false)
+      } catch (error) {
+        toast({
+          title: 'Erro ao processar pagamento',
+          description: "Verifique os dados e tente novamente.",
+          status: 'error',
+          duration: 9000,
+          isClosable: true,
+        })
+        setLoadingPayment(false)
+      }
+    }
+
+    if (paymentMethod === 'credit') {
+      try {
+        const response = await axios.post(`${process.env.BASE_URL}/products/pay/card/credit/${id}`, { ...clientData, cardData, cupomCode })
+        if (response.data.status === "failed") {
+          toast({
+            title: 'Pagamento não autorizado',
+            description: "Verifique os dados e tente novamente ou entre em contato com seu banco.",
+            status: 'error',
+            duration: 9000,
+            isClosable: true,
+          })
+        }
+        setLoadingPayment(false)
+      } catch (error) {
+
+        toast({
+          title: 'Erro ao processar pagamento',
+          description: "Verifique os dados e tente novamente.",
+          status: 'error',
+          duration: 9000,
+          isClosable: true,
+        })
+        setLoadingPayment(false)
+      }
+    }
+
+
+
 
 
   }
@@ -214,7 +271,7 @@ const Home: NextPage = () => {
             <Text fontSize={'xl'} mb="6">Método de pagamento</Text>
             <Flex gap={"12px"} alignItems="center" justifyContent={"center"} direction={{ base: "column", sm: "row" }}>
               <HStack gap={"6px"}>
-                <PaymentCard clicked={paymentMethod === "debit" && canPay} icon={debit} text="Débito" onClick={() => { setPaymentMethod("debit") }} />
+                <PaymentCard clicked={paymentMethod === "debit"} icon={debit} text="Débito" onClick={() => { setPaymentMethod("debit") }} />
                 <PaymentCard clicked={paymentMethod === "credit" && canPay} icon={credit} text="Crédito" onClick={() => { setPaymentMethod("credit") }} />
               </HStack>
               <HStack gap={"6px"}>
@@ -228,6 +285,44 @@ const Home: NextPage = () => {
 
 
         <Container padding={"0"} >
+          <Container padding={"0"} >
+            {(canPay && (paymentMethod !== "pix")) && (
+              <Container border={"1px solid"} borderColor="gray.200" padding="6" borderRadius={"md"} mb="6">
+                <Text fontSize={'xl'} mb="6">{paymentMethod === "debit" ? "Débito" : "Crédito"}</Text>
+                <Flex flexDirection="column" gap={"3"}>
+                  <VStack>
+                    <FormControl isRequired >
+                      <Input id="number" name="number" placeholder="Número do cartão" onChange={(e) => setCardData({ ...cardData, cardNumber: cardNumberMask(e.target.value) })} value={cardData.cardNumber} />
+                    </FormControl>
+
+                    <FormControl isRequired >
+
+                      <Input placeholder="Nome impresso no cartão" textTransform={"uppercase"} id="holder_name" name="holder_name" onChange={(e) => setCardData({ ...cardData, cardHolder: e.target.value })} />
+                    </FormControl>
+                  </VStack>
+                  <HStack>
+                    <FormControl isRequired  >
+                      <Input placeholder="Validade" id="expire" name="expire" value={cardData.cardExpire} onChange={(e) => setCardData({ ...cardData, cardExpire: cardExpireMask(e.target.value) })} />
+                    </FormControl>
+                    <FormControl isRequired w="250px" >
+                      <Input placeholder="CVV" id="cvv" name="cvv" maxLength={3} onChange={(e) => setCardData({ ...cardData, cardCVV: e.target.value })} />
+                    </FormControl>
+                  </HStack>
+                  {paymentMethod === "credit" && (
+                    <>
+                      <FormControl isRequired >
+                        <Select placeholder="Parcelas" id="installments" name="installments" onChange={(e) => setCardData({ ...cardData, installments: parseInt(e.target.value) })} >
+                          {new Array(10).fill(1).map((item, i) => {
+                            return <option key={i} value={i + 1}>{i + 1}x {formatCurrency(parseFloat(total.replace("R$", "")) / (i + 1))}</option>
+                          })}
+                        </Select>
+                      </FormControl></>
+                  )}
+                </Flex>
+              </Container>
+            )}
+
+          </Container>
           <Container borderRadius={'md'} bgColor="gray.100" padding={'6'} >
             <HStack mb={"3"} justifyContent={"space-between"}>
               <Text fontWeight={"bold"} fontSize="xl">Total</Text>
@@ -274,8 +369,6 @@ const Home: NextPage = () => {
                 </HStack>
               </Container>
             )}
-
-
           </Container>
           <HStack mt={"3"} justifyContent={"space-between"}>
             <FormControl>

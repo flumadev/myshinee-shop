@@ -26,34 +26,13 @@ interface IFormValues {
     city: string
     state: string
     cupomCode?: string
+    cardData?: ICardData
 }
 
-interface IPix {
-    "id": string,
-    "name": string,
-    "email": string,
-    "document": "18590537773",
-    "document_type": "cpf",
-    "type": "individual",
-    "delinquent": false,
-    "address": {
-        "id": "addr_k0D3mb4uzu5RPlWZ",
-        "line_1": "85,Rua Engenheiro Jacinto Lameira Filho,undefined",
-        "zip_code": "27511-630",
-        "city": "Resende",
-        "state": "RJ",
-        "country": "BR",
-        "status": "active",
-        "created_at": "2022-10-16T16:47:48Z",
-        "updated_at": "2022-10-16T16:47:48Z"
-    },
-    "created_at": "2022-10-13T12:46:57Z",
-    "updated_at": "2022-10-16T16:47:48Z",
-    "phones": {
-        "mobile_phone": {
-            "country_code": "55",
-            "number": "936185656",
-            "area_code": "21"
-        }
-    }
+interface ICardData {
+    cardCVV: string
+    cardExpire: string
+    cardHolder: string
+    cardNumber: string
+    installments?: number
 }
