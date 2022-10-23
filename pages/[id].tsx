@@ -23,7 +23,7 @@ const Home: NextPage = () => {
   const [productPrice, setProductPrice] = useState(formatCurrency(0))
   const [total, setTotal] = useState(formatCurrency(0))
   const [product, setProduct] = useState({} as IProduct)
-  const [paymentMethod, setPaymentMethod] = useState("" as "credit" | "debit" | "pix")
+  const [paymentMethod, setPaymentMethod] = useState("" as "credit" | "debit" | "pix" | "bankslip")
   const [canPay, setCanPay] = useState(false)
   const [clientData, setClientData] = useState({} as IFormValues)
   const [cpf, setCpf] = useState("")
