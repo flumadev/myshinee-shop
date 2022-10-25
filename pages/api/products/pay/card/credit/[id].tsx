@@ -28,7 +28,7 @@ export default async function handler(
 
 
 
-    let response: Array<any> = await data.data.json();
+    let response: Array<any> = await data.data
     const product: IProduct = response.filter(item => item.product_id == id)[0]
 
     const formData: IFormValues = req.body
@@ -88,8 +88,8 @@ export default async function handler(
         },
         "payments": [
             {
-                "payment_method": "debit_card",
-                "debit_card": {
+                "payment_method": "credit_card",
+                "credit_card": {
                     "statement_descriptor": "MyShinee",
                     "recurrence": false,
                     "installments": formData.cardData?.installments,
@@ -100,6 +100,13 @@ export default async function handler(
                         "exp_year": parseInt(formData.cardData.cardExpire.split("/")[1]),
                         "cvv": formData.cardData.cardCVV
                     },
+                    "billing_address": {
+                        "line_1": `${formData.number},${formData.street},${formData.complement}`,
+                        "zip_code": formData.zip_code,
+                        "city": formData.city,
+                        "state": formData.state,
+                        "country": "BR"
+                    }
                 }
             }
         ]

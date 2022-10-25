@@ -26,7 +26,7 @@ export default async function handler(
         res.status(500)
     }
 
-    let response: Array<any> = await data.data.json();
+    let response: Array<any> = await data.data
     const product: IProduct = response.filter(item => item.product_id == id)[0]
 
     const formData: IFormValues = req.body

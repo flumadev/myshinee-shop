@@ -106,30 +106,7 @@ const Home: NextPage = () => {
       route.push('/pix')
     }
 
-    if (paymentMethod === 'debit') {
-      try {
-        const response = await axios.post(`${process.env.BASE_URL}/products/pay/card/debit/${id}`, { ...clientData, cardData, cupomCode })
-        if (response.data.status === "failed") {
-          toast({
-            title: 'Pagamento não autorizado',
-            description: "Verifique os dados e tente novamente ou entre em contato com seu banco.",
-            status: 'error',
-            duration: 9000,
-            isClosable: true,
-          })
-        }
-        setLoadingPayment(false)
-      } catch (error) {
-        toast({
-          title: 'Erro ao processar pagamento',
-          description: "Verifique os dados e tente novamente.",
-          status: 'error',
-          duration: 9000,
-          isClosable: true,
-        })
-        setLoadingPayment(false)
-      }
-    }
+
 
     if (paymentMethod === 'credit') {
       try {
@@ -190,6 +167,8 @@ const Home: NextPage = () => {
       setDiscountValue(formatCurrency(discount))
       setLoading(false)
     }
+
+
 
   }
 
@@ -271,12 +250,11 @@ const Home: NextPage = () => {
             <Text fontSize={'xl'} mb="6">Método de pagamento</Text>
             <Flex gap={"12px"} alignItems="center" justifyContent={"center"} direction={{ base: "column", sm: "row" }}>
               <HStack gap={"6px"}>
-                <PaymentCard clicked={paymentMethod === "debit"} icon={debit} text="Débito" onClick={() => { setPaymentMethod("debit") }} />
                 <PaymentCard clicked={paymentMethod === "credit" && canPay} icon={credit} text="Crédito" onClick={() => { setPaymentMethod("credit") }} />
+                <PaymentCard clicked={paymentMethod === "pix" && canPay} icon={pix} text="Pix" onClick={() => { setPaymentMethod("pix") }} />
               </HStack>
               <HStack gap={"6px"}>
                 {/* <PaymentCard clicked={paymentMethod === "bankslip" && canPay} icon={invoice} text="Boleto" onClick={() => { setPaymentMethod("bankslip") }} /> */}
-                <PaymentCard clicked={paymentMethod === "pix" && canPay} icon={pix} text="Pix" onClick={() => { setPaymentMethod("pix") }} />
               </HStack>
             </Flex>
           </Container>
