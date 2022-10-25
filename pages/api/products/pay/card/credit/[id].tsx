@@ -95,7 +95,7 @@ export default async function handler(
                     "recurrence": false,
                     "installments": formData.cardData?.installments,
                     "card": {
-                        "number": formData.cardData.cardNumber,
+                        "number": formData.cardData.cardNumber.replaceAll(" ", ""),
                         "holder_name": formData.cardData.cardHolder,
                         "exp_month": parseInt(formData.cardData.cardExpire.split("/")[0]),
                         "exp_year": parseInt(formData.cardData.cardExpire.split("/")[1]),
