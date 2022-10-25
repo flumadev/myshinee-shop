@@ -58,6 +58,7 @@ export default async function handler(
 
 
 
+
     const customerObject = {
         "items": [
             {
@@ -93,11 +94,11 @@ export default async function handler(
                 "debit_card": {
                     "statement_descriptor": "MyShinee",
                     "card": {
-                        "number": formData.cardData?.cardNumber,
-                        "holder_name": formData.cardData?.cardHolder,
-                        "exp_month": parseInt(formData.cardData?.cardExpire.split("/")[0]),
-                        "exp_year": parseInt(formData.cardData?.cardExpire.split("/")[1]),
-                        "cvv": "235"
+                        "number": formData.cardData.cardNumber,
+                        "holder_name": formData.cardData.cardHolder.toUpperCase(),
+                        "exp_month": parseInt(formData.cardData.cardExpire.split("/")[0]),
+                        "exp_year": parseInt(formData.cardData.cardExpire.split("/")[1]),
+                        "cvv": formData.cardData.cardCVV
                     },
                 }
             }
@@ -105,11 +106,16 @@ export default async function handler(
     }
 
     try {
+        console.log(customerObject);
+
         const pmResponse = await api.post('https://api.pagar.me/core/v5/orders', customerObject)
+        console.log({ pmResponse });
+
         return res.json(pmResponse.data)
 
     } catch (err) {
         const error = err as unknown as AxiosError
+        console.log({ error });
 
         return res.json(error.response?.data)
 
@@ -120,24 +126,3 @@ export default async function handler(
 
 }
 
-
-// "payments":[{
-//     "payment_method": "debit_card",
-//     "debit_card": {
-//         "statement_descriptor": "AVENGERS",
-//         "card": {
-//             "number": "4000000000000010",
-//             "holder_name": "Tony Stark",
-//             "exp_month": 12,
-//             "exp_year": 30,
-//             "cvv": "235"
-//         },
-//         "authentication": {
-//             "type": "threed_secure",
-//             "threed_secure": {
-//                 "mpi": "acquirer",
-//                 "success_url": "http://www.pagar.me"
-//             }
-//         }
-//     }
-// }]

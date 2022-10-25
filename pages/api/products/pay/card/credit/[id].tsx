@@ -95,11 +95,11 @@ export default async function handler(
                     "recurrence": false,
                     "installments": formData.cardData?.installments,
                     "card": {
-                        "number": formData.cardData?.cardNumber,
-                        "holder_name": formData.cardData?.cardHolder,
-                        "exp_month": parseInt(formData.cardData?.cardExpire.split("/")[0]),
-                        "exp_year": parseInt(formData.cardData?.cardExpire.split("/")[1]),
-                        "cvv": "235"
+                        "number": formData.cardData.cardNumber,
+                        "holder_name": formData.cardData.cardHolder,
+                        "exp_month": parseInt(formData.cardData.cardExpire.split("/")[0]),
+                        "exp_year": parseInt(formData.cardData.cardExpire.split("/")[1]),
+                        "cvv": formData.cardData.cardCVV
                     },
                 }
             }
