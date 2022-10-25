@@ -257,8 +257,8 @@ const Home: NextPage = () => {
                 <FormControl id="city" isRequired  >
                   <Input placeholder="Cidade" id="city" name="city" />
                 </FormControl>
-                <FormControl id="state" isRequired w={"200"}>
-                  <Select placeholder='Estado' id="state" name="state" >
+                <FormControl id="state" isRequired w={"100px"}>
+                  <Select placeholder='UF' id="state" name="state" >
                     {states.map((state, i) => <option key={i} value={state.sigla}>{state.sigla}</option>)}
 
                   </Select>
@@ -275,7 +275,7 @@ const Home: NextPage = () => {
                 <PaymentCard clicked={paymentMethod === "credit" && canPay} icon={credit} text="Crédito" onClick={() => { setPaymentMethod("credit") }} />
               </HStack>
               <HStack gap={"6px"}>
-                <PaymentCard clicked={paymentMethod === "bankslip" && canPay} icon={invoice} text="Boleto" onClick={() => { setPaymentMethod("bankslip") }} />
+                {/* <PaymentCard clicked={paymentMethod === "bankslip" && canPay} icon={invoice} text="Boleto" onClick={() => { setPaymentMethod("bankslip") }} /> */}
                 <PaymentCard clicked={paymentMethod === "pix" && canPay} icon={pix} text="Pix" onClick={() => { setPaymentMethod("pix") }} />
               </HStack>
             </Flex>
