@@ -89,6 +89,7 @@ export default async function handler(
         "payments": [
             {
                 "payment_method": "credit_card",
+                "amount": itemValueToPay,
                 "credit_card": {
                     "statement_descriptor": "MyShinee",
                     "recurrence": false,
