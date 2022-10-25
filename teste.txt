@@ -1,0 +1,99 @@
+
+> myshinee-shop@0.1.0 dev /home/lfals/Projects/myshinee-shop
+> next dev
+
+ready - started server on 0.0.0.0:3000, url: http://localhost:3000
+info  - Loaded env from /home/lfals/Projects/myshinee-shop/.env.development
+event - compiled client and server successfully in 1429 ms (763 modules)
+wait  - compiling /404 (client and server)...
+event - compiled client and server successfully in 148 ms (767 modules)
+wait  - compiling /[id] (client and server)...
+event - compiled client and server successfully in 175 ms (852 modules)
+wait  - compiling /api/products/[id] (client and server)...
+event - compiled successfully in 36 ms (59 modules)
+wait  - compiling /api/products (client and server)...
+event - compiled successfully in 20 ms (62 modules)
+wait  - compiling /api/products/pay/card/debit/[id] (client and server)...
+event - compiled successfully in 105 ms (59 modules)
+wait  - compiling /api/products (client and server)...
+event - compiled successfully in 24 ms (62 modules)
+{
+  items: [ { amount: 100, description: 'Kit teste', quantity: 1 } ],
+  customer: {
+    name: 'Luis Amorim',
+    email: 'luisfelipeamorim@hotmail.com',
+    document: '18590537773',
+    document_type: 'CPF',
+    type: 'individual',
+    phones: { mobile_phone: [Object] },
+    address: {
+      line_1: '85,Rua Engenheiro Jacinto Lameira Filho,undefined',
+      zip_code: '27511-630',
+      city: 'Resende',
+      state: 'RJ',
+      country: 'BR'
+    }
+  },
+  payments: [ { payment_method: 'debit_card', debit_card: [Object] } ]
+}
+{
+  id: 'or_B6zPZGQUAUOYwrW4',
+  code: 'REGZILIP95',
+  amount: 100,
+  currency: 'BRL',
+  closed: true,
+  items: [
+    {
+      id: 'oi_KeJPmXjUJUZqdAlN',
+      type: 'product',
+      description: 'Kit teste',
+      amount: 100,
+      quantity: 1,
+      status: 'active',
+      created_at: '2022-10-25T00:52:25Z',
+      updated_at: '2022-10-25T00:52:25Z'
+    }
+  ],
+  customer: {
+    id: 'cus_G7E8WMwIkIDb0aRr',
+    name: 'Luis Amorim',
+    email: 'luisfelipeamorim@hotmail.com',
+    document: '18590537773',
+    document_type: 'cpf',
+    type: 'individual',
+    delinquent: false,
+    address: {
+      id: 'addr_k0D3mb4uzu5RPlWZ',
+      line_1: '85,Rua Engenheiro Jacinto Lameira Filho,undefined',
+      zip_code: '27511-630',
+      city: 'Resende',
+      state: 'RJ',
+      country: 'BR',
+      status: 'active',
+      created_at: '2022-10-16T16:47:48Z',
+      updated_at: '2022-10-19T01:31:40Z'
+    },
+    created_at: '2022-10-13T12:46:57Z',
+    updated_at: '2022-10-19T01:31:40Z',
+    phones: { mobile_phone: [Object] }
+  },
+  status: 'failed',
+  created_at: '2022-10-25T00:52:25Z',
+  updated_at: '2022-10-25T00:52:25Z',
+  closed_at: '2022-10-25T00:52:25Z',
+  charges: [
+    {
+      id: 'ch_KYPZ0enC1CaRxQyr',
+      code: 'REGZILIP95',
+      amount: 100,
+      status: 'failed',
+      currency: 'BRL',
+      payment_method: 'debit_card',
+      created_at: '2022-10-25T00:52:25Z',
+      updated_at: '2022-10-25T00:52:25Z',
+      customer: [Object],
+      last_transaction: [Object]
+    }
+  ],
+  checkouts: []
+}

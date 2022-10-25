@@ -94,7 +94,7 @@ export default async function handler(
                 "debit_card": {
                     "statement_descriptor": "MyShinee",
                     "card": {
-                        "number": formData.cardData.cardNumber,
+                        "number": formData.cardData.cardNumber.replaceAll(" ", ""),
                         "holder_name": formData.cardData.cardHolder.toUpperCase(),
                         "exp_month": parseInt(formData.cardData.cardExpire.split("/")[0]),
                         "exp_year": parseInt(formData.cardData.cardExpire.split("/")[1]),
@@ -106,10 +106,9 @@ export default async function handler(
     }
 
     try {
-        console.log(customerObject);
 
         const pmResponse = await api.post('https://api.pagar.me/core/v5/orders', customerObject)
-        console.log({ pmResponse });
+        console.log(pmResponse.data);
 
         return res.json(pmResponse.data)
 
@@ -117,7 +116,6 @@ export default async function handler(
         const error = err as unknown as AxiosError
         console.log({ error });
 
-        return res.json(error.response?.data)
 
 
     }
