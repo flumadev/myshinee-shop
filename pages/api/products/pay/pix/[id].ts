@@ -20,13 +20,13 @@ export default async function handler(
     }
 
     const { id } = req.query
-    const data = await fetch(`${process.env.BASE_URL}/products`)
+    const data = await axios.get(`${process.env.BASE_URL}/products`)
 
     if (data.status !== 200) {
         res.status(500)
     }
 
-    let response: Array<any> = await data.json();
+    let response: Array<any> = await data.data.json();
     const product: IProduct = response.filter(item => item.product_id == id)[0]
 
     const formData: IFormValues = req.body
