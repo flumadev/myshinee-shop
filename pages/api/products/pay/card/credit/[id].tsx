@@ -55,63 +55,57 @@ export default async function handler(
         }
     }
 
-
-
     const customerObject = {
-        "items": [
-            {
-                "amount": itemValueToPay,
-                "description": product.post_title,
-                "quantity": 1
-            }
-        ],
-        "customer": {
-            "name": formData.name,
-            "email": formData.email,
-            "document": formData.cpf.replaceAll(".", "").replaceAll("-", ""),
-            "document_type": "CPF",
-            "type": "individual",
-            "phones": {
-                "mobile_phone": {
-                    "country_code": "55",
-                    "number": formData.phone.split(" ")[1].replace("-", ""),
-                    "area_code": formData.phone.split(" ")[0].replace("(", "").replace(")", "")
+        customer: {
+            address: {
+                country: 'BR',
+                state: formData.state,
+                city: formData.city,
+                zip_code: formData.zip_code,
+                line_1: `${formData.number},${formData.street},${formData.complement}`
+            },
+            phones: {
+                home_phone: {
+                    country_code: '55',
+                    area_code: formData.phone.split(" ")[0].replace("(", "").replace(")", ""),
+                    number: formData.phone.split(" ")[1].replace("-", "")
                 }
             },
-            "address": {
-                "line_1": `${formData.number},${formData.street},${formData.complement}`,
-                "zip_code": formData.zip_code,
-                "city": formData.city,
-                "state": formData.state,
-                "country": "BR"
-            }
+            name: formData.name,
+            type: 'individual',
+            email: formData.email,
+            document: formData.cpf.replaceAll(".", "").replaceAll("-", ""),
+            document_type: 'CPF'
         },
-        "payments": [
+        items: [{ amount: itemValueToPay, description: product.post_title, quantity: 1, code: product.product_id }],
+        payments: [
             {
-                "payment_method": "credit_card",
-                "amount": itemValueToPay,
-                "credit_card": {
-                    "statement_descriptor": "MyShinee",
-                    "recurrence": false,
-                    "installments": formData.cardData?.installments,
-                    "card": {
-                        "number": formData.cardData.cardNumber.replaceAll(" ", ""),
-                        "holder_name": formData.cardData.cardHolder,
-                        "exp_month": parseInt(formData.cardData.cardExpire.split("/")[0]),
-                        "exp_year": parseInt(formData.cardData.cardExpire.split("/")[1]),
-                        "cvv": formData.cardData.cardCVV
+                credit_card: {
+                    card: {
+                        billing_address: {
+                            line_1: `${formData.number},${formData.street},${formData.complement}`,
+                            zip_code: formData.zip_code,
+                            city: formData.city,
+                            state: formData.state,
+                            country: 'BR'
+                        },
+                        number: formData.cardData.cardNumber.replaceAll(" ", ""),
+                        holder_name: formData.cardData.cardHolder,
+                        exp_month: parseInt(formData.cardData.cardExpire.split("/")[0]),
+                        exp_year: parseInt(formData.cardData.cardExpire.split("/")[1]),
+                        holder_document: formData.cpf.replaceAll(".", "").replaceAll("-", ""),
+                        cvv: formData.cardData.cardCVV
                     },
-                    "billing_address": {
-                        "line_1": `${formData.number},${formData.street},${formData.complement}`,
-                        "zip_code": formData.zip_code,
-                        "city": formData.city,
-                        "state": formData.state,
-                        "country": "BR"
-                    }
-                }
+                    operation_type: 'auth_and_capture',
+                    installments: formData.cardData.installments,
+                    statement_descriptor: 'My Shinee'
+                },
+                payment_method: 'credit_card'
             }
         ]
     }
+
+
 
     try {
         const pmResponse = await api.post('https://api.pagar.me/core/v5/orders', customerObject)
@@ -128,3 +122,26 @@ export default async function handler(
 
 
 }
+
+
+
+
+const options = {
+    method: 'POST',
+    url: 'https://api.pagar.me/core/v5/orders',
+    headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        authorization: 'Basic c2tfdGVzdF9sOURLZWxOSE5ocnBZN1ZOOg=='
+    },
+
+};
+
+axios
+    .request(options)
+    .then(function (response) {
+        console.log(response.data);
+    })
+    .catch(function (error) {
+        console.error(error);
+    });
