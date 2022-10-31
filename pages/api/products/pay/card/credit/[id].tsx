@@ -82,6 +82,7 @@ export default async function handler(
             {
                 credit_card: {
                     card: {
+                        redirect_url: "https://myshinee.com.br/obrigado-pela-compra/",
                         billing_address: {
                             line_1: `${formData.number},${formData.street},${formData.complement}`,
                             zip_code: formData.zip_code,

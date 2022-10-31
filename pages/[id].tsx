@@ -42,7 +42,6 @@ const Home: NextPage = () => {
   const { id } = route.query
   const form = useRef()
 
-
   const getProduct = async (productId: number | string | string[]) => {
     setLoading(true)
 
@@ -120,6 +119,9 @@ const Home: NextPage = () => {
             isClosable: true,
           })
         }
+        else {
+          route.push("https://myshinee.com.br/obrigado-pela-compra/")
+        }
         setLoadingPayment(false)
       } catch (error) {
 
@@ -133,9 +135,6 @@ const Home: NextPage = () => {
         setLoadingPayment(false)
       }
     }
-
-
-
 
 
   }
