@@ -15,6 +15,7 @@ export default async function handler(
 
     const response = await axios.get(`${process.env.BASE_URL}/cupons/all`)
 
+    
 
     if (response.status !== 200) {
         return res.status(422)
@@ -30,7 +31,8 @@ export default async function handler(
     }
 
 
-    const cupom = response.data.filter((item: ICupom) => item.coupon_code == id)
+    const cupom = response.data.filter((item: ICupom) => item.coupon_code == id.toUpperCase().replaceAll(" ", ""))
+    
     return res.status(200).json(cupom)
 
 
