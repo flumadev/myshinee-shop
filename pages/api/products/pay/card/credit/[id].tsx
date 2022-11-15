@@ -1,8 +1,10 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
 import axios, { AxiosError } from 'axios'
+import { push, ref, set } from 'firebase/database'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import api from '../../../../../../services/api.service'
+import { fbrtdb } from '../../../../../../services/firebase.service'
 
 interface IProduct {
     max_price: number
@@ -10,10 +12,15 @@ interface IProduct {
     product_id: number
 }
 
+
+
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
+    let cupomValue
+    let cupomCode
+    let productValue
 
     if (req.method !== "POST") {
         res.status(405).json({ message: 'Method Not Allowed' })
@@ -22,10 +29,10 @@ export default async function handler(
     const { id } = req.query
     const data = await axios.get(`${process.env.BASE_URL}/products`)
 
+
     if (data.status !== 200) {
         res.status(500)
     }
-
 
 
     let response: Array<any> = await data.data
@@ -42,7 +49,6 @@ export default async function handler(
     if (formData.cupomCode !== "") {
         const cupomResponseData = await axios.get(`${process.env.BASE_URL}/cupons/${formData.cupomCode}`)
         const cupomData: ICupom = cupomResponseData.data[0]
-        console.log(formData);
 
         if (cupomData === undefined) {
             return res.status(422).json({ message: "cupom invalido" })
@@ -51,6 +57,8 @@ export default async function handler(
         if (cupomData.discount_type === "percent") {
             const value = product.max_price * 100
             const discount = ((parseFloat(cupomData.coupon_amount) / 100) * value)
+            cupomValue = discount
+            cupomCode = formData.cupomCode
             itemValueToPay = value - discount;
         }
     }
@@ -107,9 +115,30 @@ export default async function handler(
     }
 
 
+    function writeCupomData(cupom: string, cupomValue: number, productV: any) {
+        const today = new Date()
+        const month = today.getMonth() + 1
+        const postListRef = ref(fbrtdb, 'cupons/' + cupom + '/sells/' + month);
+        const newPostRef = push(postListRef);
+        set(newPostRef, {
+            discount: cupomValue,
+            value: productV,
+            total: itemValueToPay,
+            date: today.toString(),
+            product:product.post_title,
+            cupom: cupom,
+            type: 'card'
+        });
+      }
+
 
     try {
         const pmResponse = await api.post('https://api.pagar.me/core/v5/orders', customerObject)
+        if (cupomCode && cupomValue) {
+            writeCupomData(cupomCode, cupomValue,productValue)
+
+        }
+          
         return res.json(pmResponse.data)
     } catch (err) {
 
